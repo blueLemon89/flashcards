@@ -1,7 +1,9 @@
 package com.flashcards.service;
 
+import com.flashcards.constant.ErrorMessage;
 import com.flashcards.dto.UserDto;
 import com.flashcards.entity.User;
+import com.flashcards.exception.FlashcardExceptions;
 import com.flashcards.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,10 +22,12 @@ public class UserService {
 
     public UserDto registerUser(UserDto userDto) {
         if (userRepository.existsByUsername(userDto.getUsername())) {
-            throw new RuntimeException("Username already exists");
+            throw new FlashcardExceptions.UserAlreadyExistsException(
+                String.format(ErrorMessage.USER_ALREADY_EXISTS_USERNAME, userDto.getUsername()));
         }
         if (userRepository.existsByEmail(userDto.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new FlashcardExceptions.UserAlreadyExistsException(
+                String.format(ErrorMessage.USER_ALREADY_EXISTS_EMAIL, userDto.getEmail()));
         }
 
         User user = convertToEntity(userDto);
@@ -35,19 +39,22 @@ public class UserService {
 
     public UserDto getUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new FlashcardExceptions.UserNotFoundException(
+                    String.format(ErrorMessage.USER_NOT_FOUND_WITH_ID, id)));
         return convertToDto(user);
     }
 
     public UserDto getUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new FlashcardExceptions.UserNotFoundException(
+                    String.format(ErrorMessage.USER_NOT_FOUND_WITH_USERNAME, username)));
         return convertToDto(user);
     }
 
     public UserDto updateUser(Long id, UserDto userDto) {
         User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new FlashcardExceptions.UserNotFoundException(
+                    String.format(ErrorMessage.USER_NOT_FOUND_WITH_ID, id)));
 
         existingUser.setFullName(userDto.getFullName());
         existingUser.setDefaultNotificationInterval(userDto.getDefaultNotificationInterval());
