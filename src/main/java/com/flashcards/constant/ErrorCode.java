@@ -30,6 +30,11 @@ public final class ErrorCode {
     public static final String COLLECTION_ALREADY_EXISTS = "FC2002";
     public static final String COLLECTION_ACCESS_DENIED = "FC2003";
 
+    public static final String WORD_NOT_FOUND = "FC3001";
+    public static final String WORD_ALREADY_EXISTS = "FC3002";
+    public static final String WORD_ACCESS_DENIED = "FC3003";
+
+    // Legacy - để backward compatibility
     public static final String FLASHCARD_NOT_FOUND = "FC3001";
     public static final String FLASHCARD_ALREADY_EXISTS = "FC3002";
     public static final String FLASHCARD_ACCESS_DENIED = "FC3003";
@@ -37,6 +42,10 @@ public final class ErrorCode {
     public static final String NOTIFICATION_NOT_FOUND = "FC4001";
     public static final String NOTIFICATION_ALREADY_SENT = "FC4002";
     public static final String NOTIFICATION_SCHEDULE_FAILED = "FC4003";
+
+    // Favorite related error codes
+    public static final String DUPLICATE_RESOURCE = "FC4101";
+    public static final String RESOURCE_NOT_FOUND = "FC4102";
 
     // Database related error codes
     public static final String DATABASE_CONNECTION_ERROR = "FC5001";

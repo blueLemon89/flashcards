@@ -25,13 +25,13 @@ public class NotificationScheduleDto {
     @NotNull(message = "User ID is required")
     private Long userId;
 
-    @NotNull(message = "Flashcard ID is required")
-    private Long flashcardId;
+    @NotNull(message = "Word ID is required")
+    private Long wordId;
 
-    private String flashcardEnglishWord;
-    private String flashcardVietnameseMeaning;
-    private String flashcardUsageContext;
-    private String flashcardExampleSentence;
+    private String wordEnglishWord;
+    private String wordVietnameseMeaning;
+    private String wordUsageContext;
+    private String wordExampleSentence;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

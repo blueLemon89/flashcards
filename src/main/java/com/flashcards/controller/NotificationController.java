@@ -29,9 +29,9 @@ public class NotificationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(scheduledNotification);
     }
 
-    @PostMapping("/flashcard/{flashcardId}/user/{userId}")
-    public ResponseEntity<Void> scheduleNotificationForFlashcard(@PathVariable Long flashcardId, @PathVariable Long userId) {
-        notificationService.scheduleNotificationForFlashcard(flashcardId, userId);
+    @PostMapping("/word/{wordId}/user/{userId}")
+    public ResponseEntity<Void> scheduleNotificationForWord(@PathVariable Long wordId, @PathVariable Long userId) {
+        notificationService.scheduleNotificationForWord(wordId, userId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

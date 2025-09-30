@@ -69,10 +69,10 @@ public class CollectionService {
         dto.setUserId(collection.getUser().getId());
         dto.setUserName(collection.getUser().getUsername());
 
-        if (collection.getFlashcards() != null) {
-            dto.setFlashcardCount(collection.getFlashcards().size());
+        if (collection.getWords() != null) {
+            dto.setWordCount(collection.getWords().size());
         } else {
-            dto.setFlashcardCount(0);
+            dto.setWordCount(0);
         }
 
         return dto;

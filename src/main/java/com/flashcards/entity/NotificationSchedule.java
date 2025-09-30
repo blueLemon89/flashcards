@@ -48,8 +48,8 @@ public class NotificationSchedule {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "flashcard_id", nullable = false)
-    private Flashcard flashcard;
+    @JoinColumn(name = "word_id", nullable = false)
+    private Word word;
 
     public enum NotificationType {
         VOCABULARY_REVIEW,

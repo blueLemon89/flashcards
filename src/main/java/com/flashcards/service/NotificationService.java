@@ -1,12 +1,10 @@
 package com.flashcards.service;
 
 import com.flashcards.dto.NotificationScheduleDto;
-import com.flashcards.entity.Flashcard;
-import com.flashcards.entity.NotificationSchedule;
-import com.flashcards.entity.User;
-import com.flashcards.repository.FlashcardRepository;
+import com.flashcards.entity.*;
 import com.flashcards.repository.NotificationScheduleRepository;
 import com.flashcards.repository.UserRepository;
+import com.flashcards.repository.WordRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -24,7 +22,7 @@ import java.util.stream.Collectors;
 public class NotificationService {
     private final NotificationScheduleRepository notificationScheduleRepository;
     private final UserRepository userRepository;
-    private final FlashcardRepository flashcardRepository;
+    private final WordRepository wordRepository;
 
     public List<NotificationScheduleDto> getAllNotificationsByUser(Long userId) {
         List<NotificationSchedule> notifications = notificationScheduleRepository.findByUserIdAndIsActiveTrue(userId);
@@ -34,30 +32,30 @@ public class NotificationService {
     public NotificationScheduleDto scheduleNotification(NotificationScheduleDto notificationDto) {
         User user = userRepository.findById(notificationDto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        Flashcard flashcard = flashcardRepository.findById(notificationDto.getFlashcardId())
-                .orElseThrow(() -> new RuntimeException("Flashcard not found"));
+        Word word = wordRepository.findById(notificationDto.getWordId())
+                .orElseThrow(() -> new RuntimeException("Word not found"));
 
         NotificationSchedule notification = convertToEntity(notificationDto);
         notification.setUser(user);
-        notification.setFlashcard(flashcard);
+        notification.setWord(word);
 
         notification = notificationScheduleRepository.save(notification);
         return convertToDto(notification);
     }
 
-    public void scheduleNotificationForFlashcard(Long flashcardId, Long userId) {
-        Flashcard flashcard = flashcardRepository.findById(flashcardId)
-                .orElseThrow(() -> new RuntimeException("Flashcard not found"));
+    public void scheduleNotificationForWord(Long wordId, Long userId) {
+        Word word = wordRepository.findById(wordId)
+                .orElseThrow(() -> new RuntimeException("Word not found"));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        int intervalMinutes = flashcard.getCustomNotificationInterval() != null
-            ? flashcard.getCustomNotificationInterval()
+        int intervalMinutes = word.getCustomNotificationInterval() != null
+            ? word.getCustomNotificationInterval()
             : user.getDefaultNotificationInterval();
 
         NotificationSchedule notification = new NotificationSchedule();
         notification.setUser(user);
-        notification.setFlashcard(flashcard);
+        notification.setWord(word);
         notification.setScheduledTime(LocalDateTime.now().plusMinutes(intervalMinutes));
         notification.setNotificationType(NotificationSchedule.NotificationType.VOCABULARY_REVIEW);
 
@@ -83,10 +81,20 @@ public class NotificationService {
 
     private void sendNotification(NotificationSchedule notification) {
         log.info("Sending notification to user: {}", notification.getUser().getUsername());
-        log.info("Word: {}", notification.getFlashcard().getEnglishWord());
-        log.info("Meaning: {}", notification.getFlashcard().getVietnameseMeaning());
-        log.info("Usage: {}", notification.getFlashcard().getUsageContext());
-        log.info("Example: {}", notification.getFlashcard().getExampleSentenceEnglish());
+        log.info("Word: {}", notification.getWord().getWord());
+        log.info("Phonetic: {}", notification.getWord().getPhonetic());
+        log.info("Audio: {}", notification.getWord().getAudioUrl());
+
+        // Log first meaning if available
+        if (!notification.getWord().getMeanings().isEmpty()) {
+            WordMeaning firstMeaning = notification.getWord().getMeanings().get(0);
+            log.info("Part of speech: {}", firstMeaning.getPartOfSpeech());
+            if (!firstMeaning.getDefinitions().isEmpty()) {
+                WordDefinition firstDef = firstMeaning.getDefinitions().get(0);
+                log.info("Definition: {}", firstDef.getDefinition());
+                log.info("Example: {}", firstDef.getExample());
+            }
+        }
     }
 
     public void cancelNotification(Long notificationId) {
@@ -111,11 +119,27 @@ public class NotificationService {
         dto.setSentAt(notification.getSentAt());
         dto.setIsActive(notification.getIsActive());
         dto.setUserId(notification.getUser().getId());
-        dto.setFlashcardId(notification.getFlashcard().getId());
-        dto.setFlashcardEnglishWord(notification.getFlashcard().getEnglishWord());
-        dto.setFlashcardVietnameseMeaning(notification.getFlashcard().getVietnameseMeaning());
-        dto.setFlashcardUsageContext(notification.getFlashcard().getUsageContext());
-        dto.setFlashcardExampleSentence(notification.getFlashcard().getExampleSentenceEnglish());
+        dto.setWordId(notification.getWord().getId());
+        dto.setWordEnglishWord(notification.getWord().getWord());
+
+        // Get first meaning and definition if available
+        String meaning = "";
+        String context = "";
+        String example = "";
+
+        if (!notification.getWord().getMeanings().isEmpty()) {
+            WordMeaning firstMeaning = notification.getWord().getMeanings().get(0);
+            if (!firstMeaning.getDefinitions().isEmpty()) {
+                WordDefinition firstDef = firstMeaning.getDefinitions().get(0);
+                meaning = firstDef.getDefinition();
+                context = firstMeaning.getPartOfSpeech();
+                example = firstDef.getExample() != null ? firstDef.getExample() : "";
+            }
+        }
+
+        dto.setWordVietnameseMeaning(meaning);
+        dto.setWordUsageContext(context);
+        dto.setWordExampleSentence(example);
         dto.setCreatedAt(notification.getCreatedAt());
         dto.setUpdatedAt(notification.getUpdatedAt());
         return dto;

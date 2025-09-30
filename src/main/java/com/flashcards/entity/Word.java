@@ -8,45 +8,37 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "flashcards")
+@Table(name = "words")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Flashcard {
+public class Word {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "english_word", nullable = false)
-    private String englishWord;
+    @Column(name = "word", nullable = false, unique = true)
+    private String word;
 
-    @Column(name = "vietnamese_meaning", nullable = false, columnDefinition = "TEXT")
-    private String vietnameseMeaning;
+    @Column(name = "phonetic")
+    private String phonetic;
 
-    @Column(name = "pronunciation")
-    private String pronunciation;
+    @Column(name = "audio_url")
+    private String audioUrl;
 
-    @Column(name = "part_of_speech")
-    private String partOfSpeech;
-
-    @Column(name = "usage_context", columnDefinition = "TEXT")
-    private String usageContext;
-
-    @Column(name = "example_sentence_english", columnDefinition = "TEXT")
-    private String exampleSentenceEnglish;
-
-    @Column(name = "example_sentence_vietnamese", columnDefinition = "TEXT")
-    private String exampleSentenceVietnamese;
+    @Column(name = "source_url")
+    private String sourceUrl;
 
     @Column(name = "difficulty_level")
     @Enumerated(EnumType.STRING)
     private DifficultyLevel difficultyLevel = DifficultyLevel.MEDIUM;
 
     @Column(name = "custom_notification_interval")
-    private Integer customNotificationInterval; // minutes, null = use user default
+    private Integer customNotificationInterval;
 
     @Column(name = "is_active")
     private Boolean isActive = true;
@@ -63,8 +55,14 @@ public class Flashcard {
     @JoinColumn(name = "collection_id", nullable = false)
     private Collection collection;
 
-    @OneToMany(mappedBy = "flashcard", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<NotificationSchedule> notificationSchedules;
+    @OneToMany(mappedBy = "word", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<WordPhonetic> phonetics = new ArrayList<>();
+
+    @OneToMany(mappedBy = "word", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<WordMeaning> meanings = new ArrayList<>();
+
+    @OneToMany(mappedBy = "word", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<NotificationSchedule> notificationSchedules = new ArrayList<>();
 
     public enum DifficultyLevel {
         EASY, MEDIUM, HARD

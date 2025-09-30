@@ -22,6 +22,13 @@ public class FlashcardExceptions {
         }
     }
 
+    public static class WordNotFoundException extends CustomException {
+        public WordNotFoundException(String message) {
+            super(message, ErrorCode.WORD_NOT_FOUND, 404);
+        }
+    }
+
+    // Legacy - để backward compatibility
     public static class FlashcardNotFoundException extends CustomException {
         public FlashcardNotFoundException(String message) {
             super(message, ErrorCode.FLASHCARD_NOT_FOUND, 404);
@@ -43,6 +50,18 @@ public class FlashcardExceptions {
     public static class DatabaseException extends CustomException {
         public DatabaseException(String message) {
             super(message, ErrorCode.DATABASE_CONNECTION_ERROR, 500);
+        }
+    }
+
+    public static class DuplicateResourceException extends CustomException {
+        public DuplicateResourceException(String message) {
+            super(message, ErrorCode.DUPLICATE_RESOURCE, 409);
+        }
+    }
+
+    public static class ResourceNotFoundException extends CustomException {
+        public ResourceNotFoundException(String message) {
+            super(message, ErrorCode.RESOURCE_NOT_FOUND, 404);
         }
     }
 }

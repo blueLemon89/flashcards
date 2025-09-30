@@ -41,5 +41,5 @@ public class Collection {
     private User user;
 
     @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Flashcard> flashcards;
+    private List<Word> words;
 }

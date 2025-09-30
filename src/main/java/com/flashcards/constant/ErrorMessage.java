@@ -31,14 +31,23 @@ public final class ErrorMessage {
     public static final String COLLECTION_DELETED_SUCCESS = "Collection deleted successfully";
     public static final String COLLECTION_ACCESS_DENIED = "You don't have permission to access this collection";
 
-    // Flashcard related messages
-    public static final String FLASHCARD_NOT_FOUND = "Flashcard not found";
-    public static final String FLASHCARD_NOT_FOUND_WITH_ID = "Flashcard not found with id: %s";
-    public static final String FLASHCARD_ALREADY_EXISTS = "Flashcard already exists with word: %s";
-    public static final String FLASHCARD_CREATED_SUCCESS = "Flashcard created successfully";
-    public static final String FLASHCARD_UPDATED_SUCCESS = "Flashcard updated successfully";
-    public static final String FLASHCARD_DELETED_SUCCESS = "Flashcard deleted successfully";
-    public static final String FLASHCARD_ACCESS_DENIED = "You don't have permission to access this flashcard";
+    // Word related messages
+    public static final String WORD_NOT_FOUND = "Word not found";
+    public static final String WORD_NOT_FOUND_WITH_ID = "Word not found with id: %s";
+    public static final String WORD_ALREADY_EXISTS = "Word already exists with word: %s";
+    public static final String WORD_CREATED_SUCCESS = "Word created successfully";
+    public static final String WORD_UPDATED_SUCCESS = "Word updated successfully";
+    public static final String WORD_DELETED_SUCCESS = "Word deleted successfully";
+    public static final String WORD_ACCESS_DENIED = "You don't have permission to access this word";
+
+    // Legacy - để backward compatibility
+    public static final String FLASHCARD_NOT_FOUND = "Word not found";
+    public static final String FLASHCARD_NOT_FOUND_WITH_ID = "Word not found with id: %s";
+    public static final String FLASHCARD_ALREADY_EXISTS = "Word already exists with word: %s";
+    public static final String FLASHCARD_CREATED_SUCCESS = "Word created successfully";
+    public static final String FLASHCARD_UPDATED_SUCCESS = "Word updated successfully";
+    public static final String FLASHCARD_DELETED_SUCCESS = "Word deleted successfully";
+    public static final String FLASHCARD_ACCESS_DENIED = "You don't have permission to access this word";
 
     // Notification related messages
     public static final String NOTIFICATION_NOT_FOUND = "Notification not found";

@@ -16,5 +16,5 @@ public interface NotificationScheduleRepository extends JpaRepository<Notificati
     @Query("SELECT ns FROM NotificationSchedule ns WHERE ns.scheduledTime <= :currentTime AND ns.isSent = false AND ns.isActive = true")
     List<NotificationSchedule> findPendingNotifications(@Param("currentTime") LocalDateTime currentTime);
 
-    List<NotificationSchedule> findByFlashcardIdAndIsActiveTrue(Long flashcardId);
+    List<NotificationSchedule> findByWordIdAndIsActiveTrue(Long wordId);
 }

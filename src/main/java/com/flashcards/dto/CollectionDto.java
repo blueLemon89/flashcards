@@ -23,6 +23,6 @@ public class CollectionDto {
     private LocalDateTime updatedAt;
     private Long userId;
     private String userName;
-    private List<FlashcardDto> flashcards;
-    private Integer flashcardCount;
+    private List<WordDto> words;
+    private Integer wordCount;
 }
