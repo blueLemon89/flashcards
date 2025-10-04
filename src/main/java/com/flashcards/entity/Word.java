@@ -9,13 +9,13 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Entity
 @Table(name = "words")
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class Word {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,13 +33,6 @@ public class Word {
     @Column(name = "source_url")
     private String sourceUrl;
 
-    @Column(name = "difficulty_level")
-    @Enumerated(EnumType.STRING)
-    private DifficultyLevel difficultyLevel = DifficultyLevel.MEDIUM;
-
-    @Column(name = "custom_notification_interval")
-    private Integer customNotificationInterval;
-
     @Column(name = "is_active")
     private Boolean isActive = true;
 
@@ -50,10 +43,6 @@ public class Word {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "collection_id", nullable = false)
-    private Collection collection;
 
     @OneToMany(mappedBy = "word", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<WordPhonetic> phonetics = new ArrayList<>();

@@ -1,15 +1,13 @@
 package com.flashcards.controller;
 
 import com.flashcards.dto.WordDto;
-import com.flashcards.dto.response.ApiResponse;
-import com.flashcards.service.DictionaryApiService;
 import com.flashcards.service.WordService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -18,17 +16,10 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class WordController {
     private final WordService wordService;
-    private final DictionaryApiService dictionaryApiService;
 
-    @GetMapping("/collection/{collectionId}")
-    public ResponseEntity<List<WordDto>> getWordsByCollection(@PathVariable Long collectionId) {
-        List<WordDto> words = wordService.getAllWordsByCollection(collectionId);
-        return ResponseEntity.ok(words);
-    }
-
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<WordDto>> getWordsByUser(@PathVariable Long userId) {
-        List<WordDto> words = wordService.getAllWordsByUser(userId);
+    @GetMapping
+    public ResponseEntity<List<WordDto>> getAllWords() {
+        List<WordDto> words = wordService.getAllWords();
         return ResponseEntity.ok(words);
     }
 

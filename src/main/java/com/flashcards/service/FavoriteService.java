@@ -174,14 +174,9 @@ public class FavoriteService {
         dto.setPhonetic(word.getPhonetic());
         dto.setAudioUrl(word.getAudioUrl());
         dto.setSourceUrl(word.getSourceUrl());
-        dto.setDifficultyLevel(word.getDifficultyLevel());
-        dto.setCustomNotificationInterval(word.getCustomNotificationInterval());
         dto.setIsActive(word.getIsActive());
         dto.setCreatedAt(word.getCreatedAt());
         dto.setUpdatedAt(word.getUpdatedAt());
-        if (word.getCollection() != null) {
-            dto.setCollectionId(word.getCollection().getId());
-        }
         return dto;
     }
 

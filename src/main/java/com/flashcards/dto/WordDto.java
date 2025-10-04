@@ -24,13 +24,6 @@ public class WordDto {
     private String audioUrl;
     private String sourceUrl;
 
-    private Word.DifficultyLevel difficultyLevel;
-    private Integer customNotificationInterval;
-
-    @NotNull(message = "Collection ID is required")
-    private Long collectionId;
-
-    private String collectionName;
     private Boolean isActive;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

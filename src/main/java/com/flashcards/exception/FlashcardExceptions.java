@@ -64,4 +64,16 @@ public class FlashcardExceptions {
             super(message, ErrorCode.RESOURCE_NOT_FOUND, 404);
         }
     }
+
+    public static class ExternalApiException extends CustomException {
+        public ExternalApiException(String message) {
+            super(message, ErrorCode.BAD_GATEWAY, 502);
+        }
+    }
+
+    public static class WordAlreadyExistsException extends CustomException {
+        public WordAlreadyExistsException(String message) {
+            super(message, ErrorCode.WORD_ALREADY_EXISTS, 409);
+        }
+    }
 }

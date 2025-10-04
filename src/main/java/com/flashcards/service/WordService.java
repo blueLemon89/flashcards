@@ -13,37 +13,31 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class WordService {
     private final WordRepository wordRepository;
     private final CollectionRepository collectionRepository;
 
-    public List<WordDto> getAllWordsByCollection(Long collectionId) {
-        List<Word> words = wordRepository.findByCollectionIdAndIsActiveTrue(collectionId);
+    @Transactional(readOnly = true)
+    public List<WordDto> getAllWords() {
+        List<Word> words = wordRepository.findByIsActiveTrue();
         return words.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
-    public List<WordDto> getAllWordsByUser(Long userId) {
-        List<Word> words = wordRepository.findByUserIdAndIsActiveTrue(userId);
-        return words.stream().map(this::convertToDto).collect(Collectors.toList());
-    }
-
+    @Transactional(readOnly = true)
     public WordDto getWordById(Long id) {
         Word word = wordRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Word not found"));
         return convertToDto(word);
     }
 
+    @Transactional
     public WordDto createWord(WordDto wordDto) {
-        Collection collection = collectionRepository.findById(wordDto.getCollectionId())
-                .orElseThrow(() -> new RuntimeException("Collection not found"));
-
         Word word = convertToEntity(wordDto);
-        word.setCollection(collection);
         word = wordRepository.save(word);
         return convertToDto(word);
     }
 
+    @Transactional
     public WordDto updateWord(Long id, WordDto wordDto) {
         Word existingWord = wordRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Word not found"));
@@ -52,8 +46,6 @@ public class WordService {
         existingWord.setPhonetic(wordDto.getPhonetic());
         existingWord.setAudioUrl(wordDto.getAudioUrl());
         existingWord.setSourceUrl(wordDto.getSourceUrl());
-        existingWord.setDifficultyLevel(wordDto.getDifficultyLevel());
-        existingWord.setCustomNotificationInterval(wordDto.getCustomNotificationInterval());
 
         // Update phonetics
         existingWord.getPhonetics().clear();
@@ -98,6 +90,7 @@ public class WordService {
         return convertToDto(existingWord);
     }
 
+    @Transactional
     public void deleteWord(Long id) {
         Word word = wordRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Word not found"));
@@ -105,6 +98,7 @@ public class WordService {
         wordRepository.save(word);
     }
 
+    @Transactional(readOnly = true)
     public List<WordDto> searchWords(String keyword) {
         List<Word> words = wordRepository.findByWordContainingIgnoreCaseAndIsActiveTrue(keyword);
         return words.stream().map(this::convertToDto).collect(Collectors.toList());
@@ -117,10 +111,6 @@ public class WordService {
         dto.setPhonetic(word.getPhonetic());
         dto.setAudioUrl(word.getAudioUrl());
         dto.setSourceUrl(word.getSourceUrl());
-        dto.setDifficultyLevel(word.getDifficultyLevel());
-        dto.setCustomNotificationInterval(word.getCustomNotificationInterval());
-        dto.setCollectionId(word.getCollection().getId());
-        dto.setCollectionName(word.getCollection().getName());
         dto.setIsActive(word.getIsActive());
         dto.setCreatedAt(word.getCreatedAt());
         dto.setUpdatedAt(word.getUpdatedAt());
@@ -155,8 +145,14 @@ public class WordService {
         WordMeaningDto dto = new WordMeaningDto();
         dto.setId(meaning.getId());
         dto.setPartOfSpeech(meaning.getPartOfSpeech());
-        dto.setSynonyms(meaning.getSynonyms());
-        dto.setAntonyms(meaning.getAntonyms());
+
+        // Force initialization of lazy collections
+        if (meaning.getSynonyms() != null) {
+            dto.setSynonyms(new java.util.ArrayList<>(meaning.getSynonyms()));
+        }
+        if (meaning.getAntonyms() != null) {
+            dto.setAntonyms(new java.util.ArrayList<>(meaning.getAntonyms()));
+        }
 
         if (meaning.getDefinitions() != null) {
             dto.setDefinitions(meaning.getDefinitions().stream()
@@ -172,8 +168,15 @@ public class WordService {
         dto.setId(definition.getId());
         dto.setDefinition(definition.getDefinition());
         dto.setExample(definition.getExample());
-        dto.setSynonyms(definition.getSynonyms());
-        dto.setAntonyms(definition.getAntonyms());
+
+        // Force initialization of lazy collections
+        if (definition.getSynonyms() != null) {
+            dto.setSynonyms(new java.util.ArrayList<>(definition.getSynonyms()));
+        }
+        if (definition.getAntonyms() != null) {
+            dto.setAntonyms(new java.util.ArrayList<>(definition.getAntonyms()));
+        }
+
         return dto;
     }
 
@@ -183,8 +186,6 @@ public class WordService {
         word.setPhonetic(dto.getPhonetic());
         word.setAudioUrl(dto.getAudioUrl());
         word.setSourceUrl(dto.getSourceUrl());
-        word.setDifficultyLevel(dto.getDifficultyLevel());
-        word.setCustomNotificationInterval(dto.getCustomNotificationInterval());
         return word;
     }
 }

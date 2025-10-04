@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 public class CollectionService {
     private final CollectionRepository collectionRepository;
     private final UserRepository userRepository;
+    private final com.flashcards.repository.CollectionWordRepository collectionWordRepository;
 
     public List<CollectionDto> getAllCollectionsByUser(Long userId) {
         List<Collection> collections = collectionRepository.findByUserIdAndIsActiveTrue(userId);
@@ -69,11 +70,9 @@ public class CollectionService {
         dto.setUserId(collection.getUser().getId());
         dto.setUserName(collection.getUser().getUsername());
 
-        if (collection.getWords() != null) {
-            dto.setWordCount(collection.getWords().size());
-        } else {
-            dto.setWordCount(0);
-        }
+        // Get word count from junction table
+        Long wordCount = collectionWordRepository.countByCollectionIdAndIsActiveTrue(collection.getId());
+        dto.setWordCount(wordCount != null ? wordCount.intValue() : 0);
 
         return dto;
     }

@@ -49,9 +49,8 @@ public class NotificationService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        int intervalMinutes = word.getCustomNotificationInterval() != null
-            ? word.getCustomNotificationInterval()
-            : user.getDefaultNotificationInterval();
+        // Use user's default notification interval
+        int intervalMinutes = user.getDefaultNotificationInterval();
 
         NotificationSchedule notification = new NotificationSchedule();
         notification.setUser(user);
