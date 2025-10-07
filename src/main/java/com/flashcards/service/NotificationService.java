@@ -61,7 +61,7 @@ public class NotificationService {
         notificationScheduleRepository.save(notification);
     }
 
-    @Scheduled(fixedRate = 60000) // Check every minute
+//    @Scheduled(fixedRate = 60000) // Check every minute
     public void processPendingNotifications() {
         List<NotificationSchedule> pendingNotifications =
             notificationScheduleRepository.findPendingNotifications(LocalDateTime.now());

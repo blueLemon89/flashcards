@@ -4,6 +4,7 @@ import com.flashcards.dto.WordDto;
 import com.flashcards.service.WordService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,12 @@ public class WordController {
     public ResponseEntity<WordDto> getWordById(@PathVariable Long id) {
         WordDto word = wordService.getWordById(id);
         return ResponseEntity.ok(word);
+    }
+
+    @GetMapping("/get-word-by-display")
+    public ResponseEntity<WordDto> getWordByDisplay(@RequestParam(value = "word") String word) {
+        WordDto wordDto = wordService.getByWord(word);
+        return ResponseEntity.ok(wordDto);
     }
 
     @PostMapping

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +27,13 @@ public class WordService {
     @Transactional(readOnly = true)
     public WordDto getWordById(Long id) {
         Word word = wordRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Word not found"));
+        return convertToDto(word);
+    }
+
+    @Transactional(readOnly = true)
+    public WordDto getByWord(String wordDisplay) {
+        Word word = wordRepository.findByWord(wordDisplay)
                 .orElseThrow(() -> new RuntimeException("Word not found"));
         return convertToDto(word);
     }
