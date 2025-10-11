@@ -26,17 +26,30 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false)
+    @Column
     private String password;
 
     @Column(name = "full_name")
     private String fullName;
+
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
+    @Column(name = "provider")
+    @Enumerated(EnumType.STRING)
+    private AuthProvider provider = AuthProvider.LOCAL;
+
+    @Column(name = "provider_id")
+    private String providerId;
 
     @Column(name = "default_notification_interval")
     private Integer defaultNotificationInterval = 60; // minutes
 
     @Column(name = "is_active")
     private Boolean isActive = true;
+
+    @Column(name = "is_email_verified")
+    private Boolean isEmailVerified = false;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -51,4 +64,8 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<NotificationSchedule> notificationSchedules;
+
+    public enum AuthProvider {
+        LOCAL, GOOGLE
+    }
 }
