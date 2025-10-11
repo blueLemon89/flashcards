@@ -5,6 +5,7 @@ import com.flashcards.entity.Collection;
 import com.flashcards.entity.CollectionWord;
 import com.flashcards.entity.Word;
 import com.flashcards.exception.FlashcardExceptions.*;
+import com.flashcards.mapper.CollectionWordMapper;
 import com.flashcards.repository.CollectionRepository;
 import com.flashcards.repository.CollectionWordRepository;
 import com.flashcards.repository.WordRepository;
@@ -22,6 +23,7 @@ public class CollectionWordService {
     private final CollectionWordRepository collectionWordRepository;
     private final CollectionRepository collectionRepository;
     private final WordRepository wordRepository;
+    private final CollectionWordMapper collectionWordMapper;
 
     /**
      * Add a word to a collection
@@ -43,7 +45,7 @@ public class CollectionWordService {
         collectionWord.setWord(word);
         collectionWord = collectionWordRepository.save(collectionWord);
 
-        return convertToDto(collectionWord);
+        return collectionWordMapper.toDto(collectionWord);
     }
 
     /**
@@ -52,7 +54,7 @@ public class CollectionWordService {
     public List<CollectionWordDto> getWordsByCollection(Long collectionId) {
         List<CollectionWord> collectionWords = collectionWordRepository.findByCollectionIdAndIsActiveTrue(collectionId);
         return collectionWords.stream()
-                .map(this::convertToDto)
+                .map(collectionWordMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -68,7 +70,7 @@ public class CollectionWordService {
         collectionWord.setNotes(dto.getNotes());
 
         collectionWord = collectionWordRepository.save(collectionWord);
-        return convertToDto(collectionWord);
+        return collectionWordMapper.toDto(collectionWord);
     }
 
     /**
@@ -88,23 +90,7 @@ public class CollectionWordService {
     public List<CollectionWordDto> getWordsByUser(Long userId) {
         List<CollectionWord> collectionWords = collectionWordRepository.findByUserIdAndIsActiveTrue(userId);
         return collectionWords.stream()
-                .map(this::convertToDto)
+                .map(collectionWordMapper::toDto)
                 .collect(Collectors.toList());
-    }
-
-    private CollectionWordDto convertToDto(CollectionWord collectionWord) {
-        CollectionWordDto dto = new CollectionWordDto();
-        dto.setId(collectionWord.getId());
-        dto.setCollectionId(collectionWord.getCollection().getId());
-        dto.setWordId(collectionWord.getWord().getId());
-        dto.setWord(collectionWord.getWord().getWord());
-        dto.setPhonetic(collectionWord.getWord().getPhonetic());
-        dto.setAudioUrl(collectionWord.getWord().getAudioUrl());
-        dto.setDifficultyLevel(collectionWord.getDifficultyLevel());
-        dto.setCustomNotificationInterval(collectionWord.getCustomNotificationInterval());
-        dto.setNotes(collectionWord.getNotes());
-        dto.setIsActive(collectionWord.getIsActive());
-        dto.setCreatedAt(collectionWord.getCreatedAt());
-        return dto;
     }
 }

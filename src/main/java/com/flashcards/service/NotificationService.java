@@ -2,6 +2,7 @@ package com.flashcards.service;
 
 import com.flashcards.dto.NotificationScheduleDto;
 import com.flashcards.entity.*;
+import com.flashcards.mapper.NotificationScheduleMapper;
 import com.flashcards.repository.NotificationScheduleRepository;
 import com.flashcards.repository.UserRepository;
 import com.flashcards.repository.WordRepository;
@@ -23,6 +24,7 @@ public class NotificationService {
     private final NotificationScheduleRepository notificationScheduleRepository;
     private final UserRepository userRepository;
     private final WordRepository wordRepository;
+    private final NotificationScheduleMapper notificationScheduleMapper;
 
     public List<NotificationScheduleDto> getAllNotificationsByUser(Long userId) {
         List<NotificationSchedule> notifications = notificationScheduleRepository.findByUserIdAndIsActiveTrue(userId);
@@ -35,7 +37,7 @@ public class NotificationService {
         Word word = wordRepository.findById(notificationDto.getWordId())
                 .orElseThrow(() -> new RuntimeException("Word not found"));
 
-        NotificationSchedule notification = convertToEntity(notificationDto);
+        NotificationSchedule notification = notificationScheduleMapper.toEntity(notificationDto);
         notification.setUser(user);
         notification.setWord(word);
 
@@ -110,16 +112,7 @@ public class NotificationService {
     }
 
     private NotificationScheduleDto convertToDto(NotificationSchedule notification) {
-        NotificationScheduleDto dto = new NotificationScheduleDto();
-        dto.setId(notification.getId());
-        dto.setScheduledTime(notification.getScheduledTime());
-        dto.setNotificationType(notification.getNotificationType());
-        dto.setIsSent(notification.getIsSent());
-        dto.setSentAt(notification.getSentAt());
-        dto.setIsActive(notification.getIsActive());
-        dto.setUserId(notification.getUser().getId());
-        dto.setWordId(notification.getWord().getId());
-        dto.setWordEnglishWord(notification.getWord().getWord());
+        NotificationScheduleDto dto = notificationScheduleMapper.toDto(notification);
 
         // Get first meaning and definition if available
         String meaning = "";
@@ -139,15 +132,6 @@ public class NotificationService {
         dto.setWordVietnameseMeaning(meaning);
         dto.setWordUsageContext(context);
         dto.setWordExampleSentence(example);
-        dto.setCreatedAt(notification.getCreatedAt());
-        dto.setUpdatedAt(notification.getUpdatedAt());
         return dto;
-    }
-
-    private NotificationSchedule convertToEntity(NotificationScheduleDto dto) {
-        NotificationSchedule notification = new NotificationSchedule();
-        notification.setScheduledTime(dto.getScheduledTime());
-        notification.setNotificationType(dto.getNotificationType());
-        return notification;
     }
 }

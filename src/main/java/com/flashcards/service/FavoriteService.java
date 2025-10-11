@@ -7,6 +7,9 @@ import com.flashcards.dto.WordDto;
 import com.flashcards.entity.*;
 import com.flashcards.entity.Favorite.FavoriteType;
 import com.flashcards.exception.FlashcardExceptions;
+import com.flashcards.mapper.FavoriteMapper;
+import com.flashcards.mapper.WordMapper;
+import com.flashcards.mapper.CollectionMapper;
 import com.flashcards.repository.CollectionRepository;
 import com.flashcards.repository.FavoriteRepository;
 import com.flashcards.repository.WordRepository;
@@ -26,6 +29,9 @@ public class FavoriteService {
     private final UserRepository userRepository;
     private final WordRepository wordRepository;
     private final CollectionRepository collectionRepository;
+    private final FavoriteMapper favoriteMapper;
+    private final WordMapper wordMapper;
+    private final CollectionMapper collectionMapper;
 
     // Thêm word vào favorites
     public FavoriteDto addWordToFavorites(Long userId, Long wordId) {
@@ -49,7 +55,7 @@ public class FavoriteService {
         favorite.setFavoriteType(FavoriteType.WORD);
 
         favorite = favoriteRepository.save(favorite);
-        return convertToDto(favorite);
+        return favoriteMapper.toDto(favorite);
     }
 
     // Thêm collection vào favorites
@@ -74,7 +80,7 @@ public class FavoriteService {
         favorite.setFavoriteType(FavoriteType.COLLECTION);
 
         favorite = favoriteRepository.save(favorite);
-        return convertToDto(favorite);
+        return favoriteMapper.toDto(favorite);
     }
 
     // Xóa word khỏi favorites
@@ -118,7 +124,7 @@ public class FavoriteService {
     public List<FavoriteDto> getAllFavorites(Long userId) {
         List<Favorite> favorites = favoriteRepository.findByUserId(userId);
         return favorites.stream()
-                .map(this::convertToDto)
+                .map(favoriteMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -134,64 +140,17 @@ public class FavoriteService {
         return favoriteRepository.existsByUserIdAndCollectionId(userId, collectionId);
     }
 
-    // Convert to DTO (basic)
-    private FavoriteDto convertToDto(Favorite favorite) {
-        FavoriteDto dto = new FavoriteDto();
-        dto.setId(favorite.getId());
-        dto.setUserId(favorite.getUser().getId());
-        dto.setFavoriteType(favorite.getFavoriteType());
-        dto.setCreatedAt(favorite.getCreatedAt());
-
-        if (favorite.getWord() != null) {
-            dto.setWordId(favorite.getWord().getId());
-        }
-        if (favorite.getCollection() != null) {
-            dto.setCollectionId(favorite.getCollection().getId());
-        }
-
-        return dto;
-    }
-
     // Convert to DTO with details
     private FavoriteDto convertToDtoWithDetails(Favorite favorite) {
-        FavoriteDto dto = convertToDto(favorite);
+        FavoriteDto dto = favoriteMapper.toDto(favorite);
 
         if (favorite.getWord() != null) {
-            dto.setWord(convertWordToDto(favorite.getWord()));
+            dto.setWord(wordMapper.toDto(favorite.getWord()));
         }
         if (favorite.getCollection() != null) {
-            dto.setCollection(convertCollectionToDto(favorite.getCollection()));
+            dto.setCollection(collectionMapper.toDto(favorite.getCollection()));
         }
 
-        return dto;
-    }
-
-    // Convert Word to DTO
-    private WordDto convertWordToDto(Word word) {
-        WordDto dto = new WordDto();
-        dto.setId(word.getId());
-        dto.setWord(word.getWord());
-        dto.setPhonetic(word.getPhonetic());
-        dto.setAudioUrl(word.getAudioUrl());
-        dto.setSourceUrl(word.getSourceUrl());
-        dto.setIsActive(word.getIsActive());
-        dto.setCreatedAt(word.getCreatedAt());
-        dto.setUpdatedAt(word.getUpdatedAt());
-        return dto;
-    }
-
-    // Convert Collection to DTO
-    private CollectionDto convertCollectionToDto(Collection collection) {
-        CollectionDto dto = new CollectionDto();
-        dto.setId(collection.getId());
-        dto.setName(collection.getName());
-        dto.setDescription(collection.getDescription());
-        dto.setIsActive(collection.getIsActive());
-        dto.setCreatedAt(collection.getCreatedAt());
-        dto.setUpdatedAt(collection.getUpdatedAt());
-        if (collection.getUser() != null) {
-            dto.setUserId(collection.getUser().getId());
-        }
         return dto;
     }
 }

@@ -4,6 +4,7 @@ import com.flashcards.constant.ErrorMessage;
 import com.flashcards.dto.UserDto;
 import com.flashcards.entity.User;
 import com.flashcards.exception.FlashcardExceptions;
+import com.flashcards.mapper.UserMapper;
 import com.flashcards.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
     public UserDto registerUser(UserDto userDto) {
         if (userRepository.existsByUsername(userDto.getUsername())) {
@@ -30,25 +32,28 @@ public class UserService {
                 String.format(ErrorMessage.USER_ALREADY_EXISTS_EMAIL, userDto.getEmail()));
         }
 
-        User user = convertToEntity(userDto);
+        User user = userMapper.toEntity(userDto);
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        if (userDto.getDefaultNotificationInterval() == null) {
+            user.setDefaultNotificationInterval(60);
+        }
         user = userRepository.save(user);
 
-        return convertToDto(user);
+        return userMapper.toDto(user);
     }
 
     public UserDto getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new FlashcardExceptions.UserNotFoundException(
                     String.format(ErrorMessage.USER_NOT_FOUND_WITH_ID, id)));
-        return convertToDto(user);
+        return userMapper.toDto(user);
     }
 
     public UserDto getUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new FlashcardExceptions.UserNotFoundException(
                     String.format(ErrorMessage.USER_NOT_FOUND_WITH_USERNAME, username)));
-        return convertToDto(user);
+        return userMapper.toDto(user);
     }
 
     public UserDto updateUser(Long id, UserDto userDto) {
@@ -64,34 +69,11 @@ public class UserService {
         }
 
         existingUser = userRepository.save(existingUser);
-        return convertToDto(existingUser);
+        return userMapper.toDto(existingUser);
     }
 
     public List<UserDto> getAllUsers() {
         List<User> users = userRepository.findAll();
-        return users.stream().map(this::convertToDto).collect(Collectors.toList());
-    }
-
-    private UserDto convertToDto(User user) {
-        UserDto dto = new UserDto();
-        dto.setId(user.getId());
-        dto.setUsername(user.getUsername());
-        dto.setEmail(user.getEmail());
-        dto.setFullName(user.getFullName());
-        dto.setDefaultNotificationInterval(user.getDefaultNotificationInterval());
-        dto.setIsActive(user.getIsActive());
-        dto.setCreatedAt(user.getCreatedAt());
-        dto.setUpdatedAt(user.getUpdatedAt());
-        return dto;
-    }
-
-    private User convertToEntity(UserDto dto) {
-        User user = new User();
-        user.setUsername(dto.getUsername());
-        user.setEmail(dto.getEmail());
-        user.setFullName(dto.getFullName());
-        user.setDefaultNotificationInterval(dto.getDefaultNotificationInterval() != null ?
-            dto.getDefaultNotificationInterval() : 60);
-        return user;
+        return users.stream().map(userMapper::toDto).collect(Collectors.toList());
     }
 }

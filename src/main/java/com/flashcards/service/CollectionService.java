@@ -3,6 +3,7 @@ package com.flashcards.service;
 import com.flashcards.dto.CollectionDto;
 import com.flashcards.entity.Collection;
 import com.flashcards.entity.User;
+import com.flashcards.mapper.CollectionMapper;
 import com.flashcards.repository.CollectionRepository;
 import com.flashcards.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class CollectionService {
     private final CollectionRepository collectionRepository;
     private final UserRepository userRepository;
     private final com.flashcards.repository.CollectionWordRepository collectionWordRepository;
+    private final CollectionMapper collectionMapper;
 
     public List<CollectionDto> getAllCollectionsByUser(Long userId) {
         List<Collection> collections = collectionRepository.findByUserIdAndIsActiveTrue(userId);
@@ -35,7 +37,7 @@ public class CollectionService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Collection collection = convertToEntity(collectionDto);
+        Collection collection = collectionMapper.toEntity(collectionDto);
         collection.setUser(user);
         collection = collectionRepository.save(collection);
         return convertToDto(collection);
@@ -60,27 +62,10 @@ public class CollectionService {
     }
 
     private CollectionDto convertToDto(Collection collection) {
-        CollectionDto dto = new CollectionDto();
-        dto.setId(collection.getId());
-        dto.setName(collection.getName());
-        dto.setDescription(collection.getDescription());
-        dto.setIsActive(collection.getIsActive());
-        dto.setCreatedAt(collection.getCreatedAt());
-        dto.setUpdatedAt(collection.getUpdatedAt());
-        dto.setUserId(collection.getUser().getId());
-        dto.setUserName(collection.getUser().getUsername());
-
+        CollectionDto dto = collectionMapper.toDto(collection);
         // Get word count from junction table
         Long wordCount = collectionWordRepository.countByCollectionIdAndIsActiveTrue(collection.getId());
         dto.setWordCount(wordCount != null ? wordCount.intValue() : 0);
-
         return dto;
-    }
-
-    private Collection convertToEntity(CollectionDto dto) {
-        Collection collection = new Collection();
-        collection.setName(dto.getName());
-        collection.setDescription(dto.getDescription());
-        return collection;
     }
 }
